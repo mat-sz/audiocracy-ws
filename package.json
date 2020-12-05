@@ -7,8 +7,24 @@
     "bcrypt": "^3.0.6",
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
+    "husky": "^4.3.4",
+    "lint-staged": "^10.5.3",
     "node-mpv": "^1.4.3",
+    "prettier": "^2.2.1",
     "ws": "^7.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write"
+    ],
+    "__tests__/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write"
+    ]
   },
   "scripts": {
     "start": "node src/index.js"
