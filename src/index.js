@@ -9,7 +9,7 @@ const queue = require('./queue');
 const clients = require('./clients');
 
 const app = express();
-const port = 9000;
+const port = 8000;
 const expressWs = require('express-ws')(app);
 
 app.ws('/ws', client => {

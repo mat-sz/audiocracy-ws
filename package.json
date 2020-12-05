@@ -1,4 +1,7 @@
 {
+  "name": "audiocracy-ws",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
     "@slack/web-api": "^5.3.0",
     "bcrypt": "^3.0.6",
@@ -6,5 +9,8 @@
     "express-ws": "^4.0.0",
     "node-mpv": "^1.4.3",
     "ws": "^7.2.0"
+  },
+  "scripts": {
+    "start": "node src/index.js"
   }
 }

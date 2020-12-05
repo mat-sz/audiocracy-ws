@@ -9,11 +9,7 @@ let downvotes = [];
 function state(skipStream = true) {
   return {
     type: 'state',
-    queue: queue.map(item => {
-      let newItem = { ...item };
-      delete newItem['stream'];
-      return newItem;
-    }),
+    queue: queue,
     current: current,
     downvotes: downvotes.length,
   };
