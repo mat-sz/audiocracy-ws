@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 
 const downvoteThreshold = 3;
-const password = '';
+const password = process.env.SERVER_PASSWORD;
 
 let clients = [];
 

@@ -1,3 +1,6 @@
+const dotenv = require('dotenv-flow');
+dotenv.config();
+
 const mpv = require('node-mpv');
 const express = require('express');
 
@@ -9,7 +12,7 @@ const queue = require('./queue');
 const clients = require('./clients');
 
 const app = express();
-const port = 8000;
+const port = +process.env.SERVER_PORT;
 const expressWs = require('express-ws')(app);
 
 app.ws('/ws', client => {
