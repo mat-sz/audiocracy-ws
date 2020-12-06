@@ -1,12 +1,14 @@
-const youtube = require('./scrapers/youtube');
+import { QueueItem } from './types/Models';
+
+import * as youtube from './scrapers/youtube';
 
 const scrapers = [youtube];
 
-let current = null;
-let queue = [];
-let downvotes = [];
+let current: QueueItem = null;
+let queue: QueueItem[] = [];
+let downvotes: string[] = [];
 
-function state(skipStream = true) {
+function state() {
   return {
     type: 'state',
     queue: queue,
@@ -15,7 +17,7 @@ function state(skipStream = true) {
   };
 }
 
-async function add(url) {
+async function add(url: string) {
   url.trim();
   let selected = null;
   for (let scraper of scrapers) {
@@ -39,7 +41,7 @@ async function add(url) {
   return true;
 }
 
-function downvote(ip) {
+function downvote(ip: string) {
   if (!current) return false;
   if (downvotes.includes(ip)) return false;
   downvotes.push(ip);
@@ -56,12 +58,12 @@ function next() {
   }
 }
 
-module.exports = {
+export default {
   add: add,
   state: state,
   downvote: downvote,
   next: next,
   downvoteCount: () => downvotes.length,
-  downvoted: ip => downvotes.includes(ip),
+  downvoted: (ip: string) => downvotes.includes(ip),
   current: () => current,
 };

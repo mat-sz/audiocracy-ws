@@ -1,6 +1,10 @@
-const { execFile } = require('child_process');
+import { execFile } from 'child_process';
 
-function scrape(url) {
+import { QueueItem } from '../types/Models';
+
+export const regex = /http(s):\/\/(www\.)youtu(\.be|be\.com)\/watch\?v=([a-zA-Z0-9_-]{11})$/;
+
+export function scrape(url: string): Promise<QueueItem> {
   return new Promise((resolve, _) => {
     execFile('youtube-dl', ['-j', url], (err, stdout, stderr) => {
       if (err) {
@@ -38,8 +42,3 @@ function scrape(url) {
     });
   });
 }
-
-module.exports = {
-  regex: /http(s):\/\/(www\.)youtu(\.be|be\.com)\/watch\?v=([a-zA-Z0-9_-]{11})$/,
-  scrape: scrape,
-};

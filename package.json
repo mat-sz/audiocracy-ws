@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/bcrypt": "^3.0.0",
     "@types/dotenv-flow": "^3.1.0",
     "@types/node": "^14.14.10",
     "@types/ws": "^7.4.0",

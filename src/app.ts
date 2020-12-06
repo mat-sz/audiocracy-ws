@@ -2,7 +2,7 @@ import mpv from 'node-mpv';
 import WebSocket from 'ws';
 
 import queue from './queue';
-import clients from './clients';
+import * as clients from './clients';
 
 export default async function App() {
   const player = new mpv({
@@ -15,8 +15,8 @@ export default async function App() {
   const port = parseInt(process.env.WS_PORT) || 8000;
 
   const wss = new WebSocket.Server({ host, port });
-  wss.on('connection', client => {
-    clients.add(client, queue, play, player);
+  wss.on('connection', (client, req) => {
+    clients.add(client, queue, play, player, req.connection.remoteAddress);
   });
 
   let time = 0;

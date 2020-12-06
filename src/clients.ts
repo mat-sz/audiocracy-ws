@@ -1,15 +1,16 @@
-const bcrypt = require('bcrypt');
+import WebSocket from 'ws';
+import bcrypt from 'bcrypt';
 
 const downvoteThreshold = 3;
 const password = process.env.SERVER_PASSWORD;
 
-let clients = [];
+let clients: WebSocket[] = [];
 
 setInterval(() => {
   clients = clients.filter(client => client.readyState <= 1);
 }, 5000);
 
-function broadcast(object) {
+export function broadcast(object: any) {
   let str = JSON.stringify(object);
   for (let client of clients) {
     if (client.readyState !== 1) continue;
@@ -17,19 +18,24 @@ function broadcast(object) {
   }
 }
 
-function send(client, object) {
+export function send(client: WebSocket, object: any) {
   if (client.readyState !== 1) return;
   client.send(JSON.stringify(object));
 }
 
-function add(client, queue, play, player) {
-  const ip = client._socket.remoteAddress;
+export function add(
+  client: WebSocket,
+  queue: any,
+  play: any,
+  player: any,
+  ip: string
+) {
   clients.push(client);
   send(client, queue.state());
 
   client.on('message', async data => {
     try {
-      let object = JSON.parse(data);
+      let object = JSON.parse(data as string);
       switch (object.type) {
         case 'add':
           let added = await queue.add(object.url);
@@ -72,8 +78,3 @@ function add(client, queue, play, player) {
     } catch (e) {}
   });
 }
-
-module.exports = {
-  add: add,
-  broadcast: broadcast,
-};
