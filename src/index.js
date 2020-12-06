@@ -2,7 +2,7 @@ const dotenv = require('dotenv-flow');
 dotenv.config();
 
 const mpv = require('node-mpv');
-const express = require('express');
+const WebSocket = require('ws');
 
 const player = new mpv({
   audio_only: true,
@@ -11,17 +11,13 @@ const player = new mpv({
 const queue = require('./queue');
 const clients = require('./clients');
 
-const app = express();
-const port = +process.env.SERVER_PORT;
-const expressWs = require('express-ws')(app);
+const host = process.env.WS_HOST || '127.0.0.1';
+const port = parseInt(process.env.WS_PORT) || 8000;
 
-app.ws('/ws', client => {
+const wss = new WebSocket.Server({ host, port });
+wss.on('connection', client => {
   clients.add(client, queue, play, player);
 });
-
-app.use(express.static('public'));
-
-app.listen(port);
 
 let time = 0;
 let playing = false;
