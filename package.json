@@ -10,7 +10,7 @@
     "dotenv-flow": "^3.2.0",
     "husky": "^4.3.4",
     "lint-staged": "^10.5.3",
-    "node-mpv": "^1.4.3",
+    "node-mpv": "2.0.0-beta.1",
     "prettier": "^2.2.1",
     "ts-jest": "^26.4.4",
     "ts-node-dev": "^1.0.0",
@@ -31,6 +31,8 @@
     ]
   },
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node build/index.js",
+    "build": "tsc",
+    "dev": "ts-node-dev src/index.ts --respawn --transpileOnly"
   }
 }
