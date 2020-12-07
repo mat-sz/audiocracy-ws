@@ -1,8 +1,8 @@
 import { QueueItem } from './types/Models';
 
-import * as youtube from './scrapers/youtube';
+import { YouTube } from './scrapers/YouTube';
 
-const scrapers = [youtube];
+const scrapers = [YouTube];
 
 let current: QueueItem = null;
 let queue: QueueItem[] = [];
@@ -28,7 +28,7 @@ async function add(url: string) {
   }
 
   if (!selected) {
-    selected = youtube;
+    selected = YouTube;
     url = 'ytsearch1:' + url;
   }
 
