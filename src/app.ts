@@ -1,8 +1,11 @@
 import mpv from 'node-mpv';
 import WebSocket from 'ws';
 
+import { WSClient } from './WSClient';
+import { ClientManager } from './ClientManager';
 import queue from './queue';
-import * as clients from './clients';
+import { MessageType } from './types/MessageType';
+import { TimeMessageModel } from './types/Models';
 
 export default async function App() {
   const player = new mpv({
@@ -15,22 +18,52 @@ export default async function App() {
   const port = parseInt(process.env.WS_PORT) || 8000;
 
   const wss = new WebSocket.Server({ host, port });
-  wss.on('connection', (client, req) => {
-    clients.add(client, queue, play, player, req.connection.remoteAddress);
+  const clientManager = new ClientManager(queue, play, player);
+
+  wss.on('connection', (ws, req) => {
+    const client = new WSClient(ws, req);
+    clientManager.addClient(client);
+
+    ws.on('message', (data: string) => {
+      // Prevents DDoS and abuse.
+      if (!data || data.length > 1024) return;
+
+      try {
+        const message = JSON.parse(data);
+        clientManager.handleMessage(client, message);
+      } catch (e) {}
+    });
+
+    ws.on('close', () => {
+      clientManager.removeClient(client);
+    });
   });
+
+  setInterval(() => {
+    clientManager.removeBrokenClients();
+  }, 1000);
+
+  // Ping clients to keep the connection alive (when behind nginx)
+  setInterval(() => {
+    clientManager.pingClients();
+  }, 5000);
+
+  setInterval(() => {
+    clientManager.removeInactiveClients();
+  }, 10000);
 
   let time = 0;
   let playing = false;
 
   function play() {
     if (!queue.current()) {
-      clients.broadcast(queue.state());
+      clientManager.broadcast(queue.state() as any);
       return;
     }
 
     player.load(queue.current().stream);
     player.play();
-    clients.broadcast(queue.state());
+    clientManager.broadcast(queue.state() as any);
   }
 
   (player as any).on('started', () => {
@@ -48,10 +81,10 @@ export default async function App() {
   setInterval(() => {
     if (playing) {
       time++;
-      clients.broadcast({
-        type: 'time',
+      clientManager.broadcast({
+        type: MessageType.TIME,
         time: time,
-      });
+      } as TimeMessageModel);
     }
   }, 1000);
 }
