@@ -6,6 +6,7 @@ import { ClientManager } from './ClientManager';
 import queue from './queue';
 import { MessageType } from './types/MessageType';
 import { TimeMessageModel } from './types/Models';
+import { isMessageModel } from './types/typeChecking';
 
 export default async function App() {
   const player = new mpv({
@@ -30,7 +31,10 @@ export default async function App() {
 
       try {
         const message = JSON.parse(data);
-        clientManager.handleMessage(client, message);
+
+        if (isMessageModel(message)) {
+          clientManager.handleMessage(client, message);
+        }
       } catch (e) {}
     });
 
