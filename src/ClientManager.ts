@@ -4,11 +4,13 @@ import NodeMpv from 'node-mpv';
 import { Client } from './types/Client';
 import {
   DownvotesMessageModel,
+  Message,
   MessageModel,
   PingMessageModel,
+  StateMessageModel,
 } from './types/Models';
 import { MessageType } from './types/MessageType';
-import Queue from './queue';
+import { Queue } from './Queue';
 import {
   isAddMessageModel,
   isDownvoteMessageModel,
@@ -22,14 +24,17 @@ export class ClientManager {
   private clients: Client[] = [];
 
   constructor(
-    private queue: typeof Queue,
+    private queue: Queue,
     private play: any,
     private player: NodeMpv
   ) {}
 
   addClient(client: Client) {
     this.clients.push(client);
-    client.send(this.queue.state() as any);
+    client.send({
+      type: MessageType.STATE,
+      ...this.queue.state,
+    } as StateMessageModel);
   }
 
   async handleMessage(client: Client, message: MessageModel) {
@@ -38,12 +43,15 @@ export class ClientManager {
     if (isAddMessageModel(message)) {
       let added = await this.queue.add(message.url);
       if (added === true) {
-        if (!this.queue.current()) {
+        if (!this.queue.current) {
           this.queue.next();
           this.play();
         }
 
-        this.broadcast(this.queue.state() as any);
+        this.broadcast({
+          type: MessageType.STATE,
+          ...this.queue.state,
+        } as StateMessageModel);
       } else {
         client.send({
           type: 'message',
@@ -53,12 +61,12 @@ export class ClientManager {
     } else if (isDownvoteMessageModel(message)) {
       this.queue.downvote(client.remoteAddress);
 
-      if (this.queue.downvoteCount() >= downvoteThreshold) {
+      if (this.queue.downvoteCount >= downvoteThreshold) {
         this.player.stop();
       } else {
         this.broadcast({
           type: MessageType.DOWNVOTES,
-          count: this.queue.downvoteCount(),
+          count: this.queue.downvoteCount,
         } as DownvotesMessageModel);
       }
     } else if (isSkipMessageModel(message)) {
@@ -69,7 +77,7 @@ export class ClientManager {
     }
   }
 
-  broadcast(message: MessageModel) {
+  broadcast(message: Message) {
     const data = JSON.stringify({
       ...message,
     });

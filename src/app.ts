@@ -3,9 +3,9 @@ import WebSocket from 'ws';
 
 import { WSClient } from './WSClient';
 import { ClientManager } from './ClientManager';
-import queue from './queue';
+import { Queue } from './Queue';
 import { MessageType } from './types/MessageType';
-import { TimeMessageModel } from './types/Models';
+import { StateMessageModel, TimeMessageModel } from './types/Models';
 import { isMessageModel } from './types/typeChecking';
 
 export default async function App() {
@@ -17,6 +17,7 @@ export default async function App() {
 
   const host = process.env.WS_HOST || '127.0.0.1';
   const port = parseInt(process.env.WS_PORT) || 8000;
+  const queue = new Queue();
 
   const wss = new WebSocket.Server({ host, port });
   const clientManager = new ClientManager(queue, play, player);
@@ -60,14 +61,20 @@ export default async function App() {
   let playing = false;
 
   function play() {
-    if (!queue.current()) {
-      clientManager.broadcast(queue.state() as any);
+    if (!queue.current) {
+      clientManager.broadcast({
+        type: MessageType.STATE,
+        ...queue.state,
+      } as StateMessageModel);
       return;
     }
 
-    player.load(queue.current().stream);
+    player.load(queue.current.stream);
     player.play();
-    clientManager.broadcast(queue.state() as any);
+    clientManager.broadcast({
+      type: MessageType.STATE,
+      ...queue.state,
+    } as StateMessageModel);
   }
 
   (player as any).on('started', () => {
