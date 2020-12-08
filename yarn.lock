@@ -1006,6 +1006,13 @@ map-obj@^1.0.0, map-obj@^1.0.1:
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
   integrity sha1-2TPOuSBdgr3PSIb2dCvcK03qFG0=
 
+media-api@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/media-api/-/media-api-0.0.9.tgz#0c959c3652bbab9985b67fa9dad305017186c446"
+  integrity sha512-NSY8q8GwdgMMAN3LzUs8afGoRdOLT7SHQHzEKJhD4NVi2ioA9S8XqjC7pFi+3j9qlAsKKik1zYaUOdXkPoHv9g==
+  dependencies:
+    node-fetch "2.x"
+
 meow@^3.3.0:
   version "3.7.0"
   resolved "https://registry.yarnpkg.com/meow/-/meow-3.7.0.tgz#72cb668b425228290abbfa856892587308a801fb"
@@ -1107,6 +1114,11 @@ needle@^2.2.1:
     debug "^3.2.6"
     iconv-lite "^0.4.4"
     sax "^1.2.4"
+
+node-fetch@2.x:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
+  integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
 node-mpv@2.0.0-beta.1:
   version "2.0.0-beta.1"

@@ -1,9 +1,9 @@
 import { QueueItem } from './types/Models';
 
-import { YouTube } from './scrapers/YouTube';
+import { YouTubeScraper } from './scrapers/YouTube';
 import { Scraper } from './types/Scraper';
 
-const scrapers: Scraper[] = [YouTube];
+const scrapers: Scraper[] = [YouTubeScraper];
 
 export class Queue {
   private _current: QueueItem = null;
@@ -21,7 +21,7 @@ export class Queue {
     }
 
     if (!selected) {
-      selected = YouTube;
+      selected = YouTubeScraper;
       url = 'ytsearch1:' + url;
     }
 

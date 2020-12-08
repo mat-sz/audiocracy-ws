@@ -1,45 +1,42 @@
-import { execFile } from 'child_process';
+import { ContentStreamType, YouTube } from 'media-api';
 
 import { Scraper } from '../types/Scraper';
 
-export const YouTube: Scraper = {
-  regex: /http(s):\/\/(www\.)youtu(\.be|be\.com)\/watch\?v=([a-zA-Z0-9_-]{11})$/,
-  scrape: (url: string) => {
-    return new Promise((resolve, _) => {
-      execFile('youtube-dl', ['-j', url], (err, stdout, stderr) => {
-        if (err) {
-          resolve(null);
-          return;
-        }
+const regex = /http(?:s):\/\/(?:www\.)youtu(?:\.be|be\.com)\/watch\?v=([a-zA-Z0-9_-]{11})$/;
 
-        try {
-          let response = JSON.parse(stdout);
+export const YouTubeScraper: Scraper = {
+  regex,
+  scrape: async (url: string) => {
+    const youtube = new YouTube();
+    const match = regex.exec(url);
+    if (!match[1]) {
+      return null;
+    }
 
-          let url = null;
-          for (let format of response['formats']) {
-            if (format['acodec'] != 'none' && format['vcodec'] == 'none') {
-              url = format['url'];
-            }
-          }
+    const content = await youtube.content(match[1]);
+    let streamUrl = null;
+    for (let stream of content.streams.sort(
+      (a, b) => (b.bitrate || 0) - (a.bitrate || 0)
+    )) {
+      if (stream.type === ContentStreamType.AUDIO) {
+        streamUrl = stream.url;
+        break;
+      }
+    }
 
-          if (!url) {
-            resolve(null);
-          } else {
-            resolve({
-              id: response['id'],
-              url: response['webpage_url'],
-              stream: url,
-              title: response['title'],
-              author: response['uploader'],
-              thumbnail: response['thumbnail'],
-              duration: +response['duration'],
-              website: 'youtube',
-            });
-          }
-        } catch (e) {
-          resolve(null);
-        }
-      });
-    });
+    if (!streamUrl) {
+      return null;
+    }
+
+    return {
+      id: content.id,
+      url,
+      stream: streamUrl,
+      title: content.title,
+      author: content.author?.name,
+      thumbnail: content.thumbnails?.[0]?.url,
+      duration: content.duration,
+      website: 'youtube',
+    };
   },
 };
