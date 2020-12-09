@@ -3,11 +3,11 @@ import { ContentStreamType, YouTube } from 'media-api';
 import { Scraper } from '../types/Scraper';
 
 const regex = /http(?:s):\/\/(?:www\.)youtu(?:\.be|be\.com)\/watch\?v=([a-zA-Z0-9_-]{11})$/;
+const youtube = new YouTube();
 
 export const YouTubeScraper: Scraper = {
   regex,
   scrape: async (url: string) => {
-    const youtube = new YouTube();
     const match = regex.exec(url);
     if (!match[1]) {
       return null;
@@ -38,5 +38,18 @@ export const YouTubeScraper: Scraper = {
       duration: content.duration,
       website: 'youtube',
     };
+  },
+  search: async (text: string) => {
+    const results = await youtube.search(text);
+
+    return results.contents?.map(content => ({
+      id: content.id,
+      url: 'https://www.youtube.com/watch?v=' + content.id,
+      title: content.title,
+      author: content.author?.name,
+      thumbnail: content.thumbnails?.[0]?.url,
+      duration: content.duration,
+      website: 'youtube',
+    }));
   },
 };

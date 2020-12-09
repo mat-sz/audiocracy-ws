@@ -1,11 +1,12 @@
 export enum MessageType {
-  // Received:
+  // Sent:
   STATE = 'state',
   MESSAGE = 'message',
   DOWNVOTES = 'downvotes',
   TIME = 'time',
+  SEARCH = 'search',
 
-  // Sent:
+  // Recieved:
   DOWNVOTE = 'downvote',
   ADD = 'add',
   SKIP = 'skip',

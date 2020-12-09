@@ -18,6 +18,11 @@ export interface DownvotesMessageModel extends MessageModel {
   count: number;
 }
 
+export interface SearchMessageModel extends MessageModel {
+  type: MessageType.SEARCH;
+  items: QueueItem[];
+}
+
 export interface TimeMessageModel extends MessageModel {
   type: MessageType.TIME;
   time: number;
@@ -46,6 +51,7 @@ export type Message =
   | StateMessageModel
   | MessageMessageModel
   | DownvotesMessageModel
+  | SearchMessageModel
   | TimeMessageModel
   | AddMessageModel
   | DownvoteMessageModel
@@ -54,8 +60,8 @@ export type Message =
 
 export interface QueueItem {
   id: string;
-  url?: string;
-  stream: string;
+  url: string;
+  stream?: string;
   title: string;
   author?: string;
   thumbnail?: string;
