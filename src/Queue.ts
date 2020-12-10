@@ -1,7 +1,8 @@
-import { QueueItem } from './types/Models';
+import { Message, QueueItem } from './types/Models';
 
 import { YouTubeScraper } from './scrapers/YouTube';
 import { Scraper } from './types/Scraper';
+import { MessageType } from './types/MessageType';
 
 const scrapers: Scraper[] = [YouTubeScraper];
 
@@ -10,7 +11,7 @@ export class Queue {
   private _queue: QueueItem[] = [];
   private _downvotes: string[] = [];
 
-  async add(url: string) {
+  async add(url: string): Promise<Message> {
     url.trim();
     let selected = null;
     for (let scraper of scrapers) {
@@ -22,17 +23,41 @@ export class Queue {
 
     if (!selected) {
       selected = YouTubeScraper;
-      url = 'ytsearch1:' + url;
+      const results = await selected.search(url);
+
+      if (!results || results.length === 0) {
+        return {
+          type: MessageType.MESSAGE,
+          text: 'Not found.',
+        };
+      }
+
+      return {
+        type: MessageType.SEARCH,
+        items: results,
+      };
     }
 
     let info = await selected.scrape(url);
-    if (!info) return 'Not found.';
+    if (!info) {
+      return {
+        type: MessageType.MESSAGE,
+        text: 'Not found.',
+      };
+    }
 
-    if (this._queue.find(item => item.id == info.id))
-      return 'Already in queue.';
+    if (this._queue.find(item => item.id == info.id)) {
+      return {
+        type: MessageType.MESSAGE,
+        text: 'Already in queue.',
+      };
+    }
 
     this._queue.push(info);
-    return true;
+    return {
+      type: MessageType.STATE,
+      ...this.state,
+    };
   }
 
   downvote(ip: string) {
@@ -60,7 +85,6 @@ export class Queue {
 
   get state() {
     return {
-      type: 'state',
       queue: this._queue,
       current: this._current,
       downvotes: this._downvotes.length,

@@ -41,22 +41,17 @@ export class ClientManager {
     client.lastSeen = new Date();
 
     if (isAddMessageModel(message)) {
-      let added = await this.queue.add(message.url);
-      if (added === true) {
+      const result = await this.queue.add(message.url);
+
+      if (result.type === MessageType.STATE) {
         if (!this.queue.current) {
           this.queue.next();
           this.play();
         }
 
-        this.broadcast({
-          type: MessageType.STATE,
-          ...this.queue.state,
-        } as StateMessageModel);
+        this.broadcast(result);
       } else {
-        client.send({
-          type: 'message',
-          text: added,
-        });
+        client.send(result);
       }
     } else if (isDownvoteMessageModel(message)) {
       this.queue.downvote(client.remoteAddress);
