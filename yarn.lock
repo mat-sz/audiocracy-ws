@@ -1006,10 +1006,10 @@ map-obj@^1.0.0, map-obj@^1.0.1:
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
   integrity sha1-2TPOuSBdgr3PSIb2dCvcK03qFG0=
 
-media-api@^0.0.9:
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/media-api/-/media-api-0.0.9.tgz#0c959c3652bbab9985b67fa9dad305017186c446"
-  integrity sha512-NSY8q8GwdgMMAN3LzUs8afGoRdOLT7SHQHzEKJhD4NVi2ioA9S8XqjC7pFi+3j9qlAsKKik1zYaUOdXkPoHv9g==
+media-api@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/media-api/-/media-api-0.0.11.tgz#daae5eb7d0f040ba063429331a33a9c6897e24a0"
+  integrity sha512-muv5UI64tGTcbe33U56YuSYS+q6cxJ729Ovp/puzl6iQO3LVDVl185SzPlc1cy7BaVdtGBa9sdtWaJpGJq28Wg==
   dependencies:
     node-fetch "2.x"
 

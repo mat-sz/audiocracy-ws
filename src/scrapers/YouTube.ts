@@ -30,7 +30,7 @@ export const YouTubeScraper: Scraper = {
 
     return {
       id: content.id,
-      url,
+      url: content.url,
       stream: streamUrl,
       title: content.title,
       author: content.author?.name,
@@ -44,7 +44,7 @@ export const YouTubeScraper: Scraper = {
 
     return results.contents?.map(content => ({
       id: content.id,
-      url: 'https://www.youtube.com/watch?v=' + content.id,
+      url: content.url,
       title: content.title,
       author: content.author?.name,
       thumbnail: content.thumbnails?.[0]?.url,
