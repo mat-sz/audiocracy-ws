@@ -23,11 +23,7 @@ const password = process.env.SERVER_PASSWORD;
 export class ClientManager {
   private clients: Client[] = [];
 
-  constructor(
-    private queue: Queue,
-    private play: any,
-    private player: NodeMpv
-  ) {}
+  constructor(private queue: Queue, private player: NodeMpv) {}
 
   addClient(client: Client) {
     this.clients.push(client);
@@ -44,11 +40,6 @@ export class ClientManager {
       const result = await this.queue.add(message.url);
 
       if (result.type === MessageType.STATE) {
-        if (!this.queue.current) {
-          this.queue.next();
-          this.play();
-        }
-
         this.broadcast(result);
       } else {
         client.send(result);

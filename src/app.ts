@@ -17,10 +17,10 @@ export default async function App() {
 
   const host = process.env.WS_HOST || '127.0.0.1';
   const port = parseInt(process.env.WS_PORT) || 8000;
-  const queue = new Queue();
+  const queue = new Queue(play);
 
   const wss = new WebSocket.Server({ host, port });
-  const clientManager = new ClientManager(queue, play, player);
+  const clientManager = new ClientManager(queue, player);
 
   wss.on('connection', (ws, req) => {
     const client = new WSClient(ws, req);

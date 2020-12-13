@@ -11,6 +11,8 @@ export class Queue {
   private _queue: QueueItem[] = [];
   private _downvotes: string[] = [];
 
+  constructor(private play: any) {}
+
   async add(url: string): Promise<Message> {
     url.trim();
     let selected = null;
@@ -54,6 +56,12 @@ export class Queue {
     }
 
     this._queue.push(info);
+
+    if (!this.current) {
+      this.next();
+      this.play();
+    }
+
     return {
       type: MessageType.STATE,
       ...this.state,
