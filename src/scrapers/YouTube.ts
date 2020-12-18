@@ -12,7 +12,7 @@ export const YouTubeScraper: Scraper = {
   regex,
   scrape: async (url: string) => {
     const match = regex.exec(url);
-    if (!match[1]) {
+    if (!match?.[1]) {
       return null;
     }
 

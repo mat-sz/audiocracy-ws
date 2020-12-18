@@ -3,7 +3,7 @@ dotenv.config();
 
 import mpv from 'node-mpv';
 import Koa from 'koa';
-import router from '@koa/router';
+import Router from '@koa/router';
 import websockify from 'koa-websocket';
 
 import { WSClient } from './WSClient';
@@ -12,8 +12,10 @@ import { Queue } from './Queue';
 import { MessageType } from './types/MessageType';
 import { StateMessageModel, TimeMessageModel } from './types/Models';
 import { isMessageModel } from './types/typeChecking';
+import { YouTubeScraper } from './scrapers/YouTube';
 
 const app = websockify(new Koa());
+const router = new Router();
 
 async function App() {
   const player = new mpv({
@@ -52,6 +54,36 @@ async function App() {
     }
 
     return next();
+  });
+
+  router.get('/stream', async (ctx, next) => {
+    if (!ctx.query['id'] || !ctx.query['service']) {
+      ctx.res.end(
+        JSON.stringify({ error: 'Unsupported service or missing id.' })
+      );
+      return;
+    }
+
+    if (ctx.query['service'] !== 'youtube') {
+      ctx.res.end(JSON.stringify({ error: 'Unsupported service.' }));
+      return;
+    }
+
+    try {
+      const item = await YouTubeScraper.scrape(
+        'https://www.youtube.com/watch?v=' + ctx.query['id']
+      );
+
+      if (!item || !item.stream) {
+        ctx.res.end(JSON.stringify({ error: 'Invalid id.' }));
+        return;
+      }
+
+      ctx.redirect(item.stream);
+    } catch (e) {
+      ctx.res.end(JSON.stringify({ error: 'Error.' }));
+      return;
+    }
   });
 
   setInterval(() => {
@@ -109,6 +141,7 @@ async function App() {
     }
   }, 1000);
 
+  app.use(router.routes()).use(router.allowedMethods());
   app.listen(port, host);
 }
 
