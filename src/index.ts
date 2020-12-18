@@ -13,6 +13,7 @@ import { MessageType } from './types/MessageType';
 import { StateMessageModel, TimeMessageModel } from './types/Models';
 import { isMessageModel } from './types/typeChecking';
 import { YouTubeScraper } from './scrapers/YouTube';
+import { scrapers } from './scrapers';
 
 const app = websockify(new Koa());
 const router = new Router();
@@ -56,7 +57,7 @@ async function App() {
     return next();
   });
 
-  router.get('/stream', async (ctx, next) => {
+  router.get('/stream', async ctx => {
     if (!ctx.query['id'] || !ctx.query['service']) {
       ctx.res.end(
         JSON.stringify({ error: 'Unsupported service or missing id.' })
@@ -64,15 +65,17 @@ async function App() {
       return;
     }
 
-    if (ctx.query['service'] !== 'youtube') {
+    const id = ctx.query['id'];
+    const service = ctx.query['service'];
+    const scraper = scrapers.find(scraper => scraper.id === service);
+
+    if (!scraper) {
       ctx.res.end(JSON.stringify({ error: 'Unsupported service.' }));
       return;
     }
 
     try {
-      const item = await YouTubeScraper.scrape(
-        'https://www.youtube.com/watch?v=' + ctx.query['id']
-      );
+      const item = await scraper.scrapeId(id);
 
       if (!item || !item.stream) {
         ctx.res.end(JSON.stringify({ error: 'Invalid id.' }));

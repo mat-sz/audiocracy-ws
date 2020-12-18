@@ -1,10 +1,7 @@
 import { Message, QueueItem } from './types/Models';
 
-import { YouTubeScraper } from './scrapers/YouTube';
-import { Scraper } from './types/Scraper';
+import { scrapers } from './scrapers';
 import { MessageType } from './types/MessageType';
-
-const scrapers: Scraper[] = [YouTubeScraper];
 
 export class Queue {
   private _current: QueueItem = null;
@@ -24,7 +21,7 @@ export class Queue {
     }
 
     if (!selected) {
-      selected = YouTubeScraper;
+      selected = scrapers[0];
       const results = await selected.search(url);
 
       if (!results || results.length === 0) {
