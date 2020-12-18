@@ -67,6 +67,7 @@ export interface QueueItem {
   thumbnail?: string;
   duration: number;
   website: string;
+  expiresAt?: Date;
 }
 
 export interface ServerState {
