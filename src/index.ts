@@ -1,7 +1,6 @@
 import dotenv from 'dotenv-flow';
 dotenv.config();
 
-import mpv from 'node-mpv';
 import Koa from 'koa';
 import Router from '@koa/router';
 import websockify from 'koa-websocket';
@@ -12,24 +11,17 @@ import { Queue } from './Queue';
 import { MessageType } from './types/MessageType';
 import { StateMessageModel, TimeMessageModel } from './types/Models';
 import { isMessageModel } from './types/typeChecking';
-import { YouTubeScraper } from './scrapers/YouTube';
 import { scrapers } from './scrapers';
 
 const app = websockify(new Koa());
 const router = new Router();
 
 async function App() {
-  const player = new mpv({
-    audio_only: true,
-  });
-
-  await player.start();
-
   const host = process.env.WS_HOST || '127.0.0.1';
   const port = parseInt(process.env.WS_PORT) || 8000;
   const queue = new Queue(play);
 
-  const clientManager = new ClientManager(queue, player);
+  const clientManager = new ClientManager(queue);
 
   app.ws.use(function (ctx, next) {
     if (ctx.websocket) {
@@ -114,35 +106,12 @@ async function App() {
       return;
     }
 
-    player.load(queue.current.stream);
-    player.play();
+    // TODO: New playback logic.
     clientManager.broadcast({
       type: MessageType.STATE,
       ...queue.state,
     } as StateMessageModel);
   }
-
-  (player as any).on('started', () => {
-    time = 0;
-    playing = true;
-  });
-
-  (player as any).on('stopped', () => {
-    playing = false;
-    time = 0;
-    queue.next();
-    play();
-  });
-
-  setInterval(() => {
-    if (playing) {
-      time++;
-      clientManager.broadcast({
-        type: MessageType.TIME,
-        time: time,
-      } as TimeMessageModel);
-    }
-  }, 1000);
 
   app.use(router.routes()).use(router.allowedMethods());
   app.listen(port, host);

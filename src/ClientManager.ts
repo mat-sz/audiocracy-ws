@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import NodeMpv from 'node-mpv';
 
 import { Client } from './types/Client';
 import {
@@ -23,7 +22,7 @@ const password = process.env.SERVER_PASSWORD;
 export class ClientManager {
   private clients: Client[] = [];
 
-  constructor(private queue: Queue, private player: NodeMpv) {}
+  constructor(private queue: Queue) {}
 
   addClient(client: Client) {
     this.clients.push(client);
@@ -48,7 +47,7 @@ export class ClientManager {
       this.queue.downvote(client.remoteAddress);
 
       if (this.queue.downvoteCount >= downvoteThreshold) {
-        this.player.stop();
+        this.queue.next();
       } else {
         this.broadcast({
           type: MessageType.DOWNVOTES,
@@ -58,7 +57,7 @@ export class ClientManager {
     } else if (isSkipMessageModel(message)) {
       if (!message.password) return;
       if (await bcrypt.compare(message.password, password)) {
-        this.player.stop();
+        this.queue.next();
       }
     }
   }
